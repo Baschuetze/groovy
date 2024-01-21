@@ -37,9 +37,13 @@ tasks.withType(Test).configureEach {
     def grapeDirectory = new File(temporaryDir, 'grape')
     def jdk8 = ['-XX:+UseConcMarkSweepGC']
     def jdk9 = ['-Djava.locale.providers=COMPAT,SPI'/*, '--illegal-access=debug'*/]
+    def jdk22 = ['-Djava.locale.providers=CLDR,SPI'] /* WARNING: COMPAT locale provider will be removed in a future release */
     def common = ['-ea', "-Xms${groovyJUnit_ms}", "-Xmx${groovyJUnit_mx}", '-Duser.language=en']
     if (JavaVersion.current().isJava9Compatible()) {
         jvmArgs(*common, *jdk9)
+        systemProperty 'groovy.force.illegal.access', findProperty('groovy.force.illegal.access')
+    } else if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_22)) {
+        jvmArgs(*common, *jdk22)
         systemProperty 'groovy.force.illegal.access', findProperty('groovy.force.illegal.access')
     } else {
         jvmArgs(*common, *jdk8)
